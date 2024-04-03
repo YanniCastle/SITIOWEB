@@ -1,0 +1,13 @@
+body {
+  background-color: bisque;
+}
+h1{
+  color: brown
+}
+.card-text{/*texto en card*/
+  color: red;
+}
+.btn-primary{/*Boton carrusel*/
+  color: aqua;
+  background-color: black;
+}
