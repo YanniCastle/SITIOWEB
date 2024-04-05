@@ -33,14 +33,18 @@ switch ($accion) {
   case "Agregar": //AQUI AGREGAR COMPRIMIR
     if ($_FILES['txtImagen']['size'] <= 5120000) {
       
+      
       $allowed_types = array('image/jpeg', 'image/png', 'image/gif');
       if (in_array($_FILES['txtImagen']['type'], $allowed_types)) {
+        //PENDIENTE: COMRIMIR IMAGEN
+        //include("../comprimir/upload.php");
         
       //INSERT INTO `libros` (`id`, `nombre`, `imagen`) VALUES (NULL, 'Libro de C', 'logotipo.png');    
       $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
       $sentenciaSQL->bindParam(':nombre', $txtNombre);
 
       //Ahora agregaremos imagen a carpeta img
+      
       //fecha es importante para evitar sobre escribir imagenes iguales 
       $fecha = new DateTime();
       $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
@@ -50,32 +54,6 @@ switch ($accion) {
       if ($tmpImagen != "") {
         //TRATO DE AGREGAR LA FUNCION
       
-//function compressImage($source, $destination, $quality) { 
-    // Obtenemos la información de la imagen
-    $imgInfo = getimagesize($source); 
-    $mime = $imgInfo['mime']; 
-     
-    // Creamos una imagen
-    switch($mime){ 
-        case 'image/jpeg': 
-            $image = imagecreatefromjpeg($source); 
-            break; 
-        case 'image/png': 
-            $image = imagecreatefrompng($source); 
-            break; 
-        case 'image/gif': 
-            $image = imagecreatefromgif($source); 
-            break; 
-        default: 
-            $image = imagecreatefromjpeg($source); 
-    } 
-     
-    // Guardamos la imagen
-    imagejpeg($image, $destination, $quality); 
-     
-    // Devolvemos la imagen comprimida
-    return $destination; 
-//}
 
          // $uploadPath = "../../img/"; 
          // $fileName = basename($_FILES["image"]["name"]);
@@ -93,8 +71,8 @@ switch ($accion) {
       header("Location:productos.php");
 
     }//fin de type
-    else{
-      $mensaje = "Solo se permiten archivos de imagen (JPEG, PNG, GIF)";}
+    //else{
+     // $mensaje = "Solo se permiten archivos de imagen (JPEG, PNG, GIF)";}
     }//fin de size
      else {
       $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
