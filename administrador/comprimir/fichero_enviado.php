@@ -1,10 +1,14 @@
 <?php
 if (isset($_POST["submit"])) {
+  if ($_FILES["image"]["size"] <= 5120000) {
   $status = 'error';
   if (!empty($_FILES["image"]["name"])) {
-    // File info 
+
+    $fecha = new DateTime();
+    $nombreArchivo = ($_FILES["image"]["name"] != "") ? $fecha->getTimestamp() . "_" . $_FILES["image"]["name"] : "sin_imagen.jpg";
+
     $fileName = basename($_FILES["image"]["name"]);
-    $imageUploadPath = $uploadPath . $fileName;
+    $imageUploadPath = $uploadPath . $nombreArchivo;
     $fileType = pathinfo($imageUploadPath, PATHINFO_EXTENSION);
 
     // Permitimos solo unas extensiones
@@ -28,5 +32,8 @@ if (isset($_POST["submit"])) {
   } else {
     $statusMsg = 'Por favor, selecciona una imagen.';
   }
-} 
+  }/*fin de size */ else {
+    echo "Demasiado grande la imagen";
+  }
+}//fin del post
 ?>

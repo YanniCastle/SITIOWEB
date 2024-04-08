@@ -9,74 +9,29 @@ $txtImagen = (isset($_FILES['txtImagen']['name'])) ? $_FILES['txtImagen']['name'
 $accion = (isset($_POST['accion'])) ? $_POST['accion'] : "";
 
 include("../config/bd.php");
-/*Para conectarse a BD
-$host="localhost";
-$bd="sitio";
-$usuario="root";
-$contrasenia="";
-//01:35:12
-try {//PDO me comunica directamente con BD  01:36:10
-  $conexion=new PDO("mysql:host=$host; dbname=$bd", $usuario, $contrasenia);
-  if($conexion) echo "Conectado... a sitio<br/>";
-} catch (Exception $ex) {
-  echo $ex->getMessage();//Muestrame el error de conexion
-}*/
-
-/*Para ver datos que se envian
-echo $txtID     . "<br/>";
-echo $txtNombre . "<br/>";
-echo $txtImagen . "<br/>";
-echo $accion    . "<br/>";*/
 
 switch ($accion) {
-    //COPIAR A NEWPRODUCTOS.PHP PARA PROBAR SINTAXIS//
-  case "Agregar": //AQUI AGREGAR COMPRIMIR
-    if ($_FILES['txtImagen']['size'] <= 5120000) {
-      
-      
-      $allowed_types = array('image/jpeg', 'image/png', 'image/gif');
-      if (in_array($_FILES['txtImagen']['type'], $allowed_types)) {
-        //PENDIENTE: COMRIMIR IMAGEN
-        //include("../comprimir/upload.php");
-        
-      //INSERT INTO `libros` (`id`, `nombre`, `imagen`) VALUES (NULL, 'Libro de C', 'logotipo.png');    
+  
+  case "Agregar":
+
       $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
       $sentenciaSQL->bindParam(':nombre', $txtNombre);
-
-      //Ahora agregaremos imagen a carpeta img
       
-      //fecha es importante para evitar sobre escribir imagenes iguales 
       $fecha = new DateTime();
       $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
 
-      $tmpImagen = $_FILES["txtImagen"]["tmp_name"]; //2:12:15
-
-      if ($tmpImagen != "") {
-        //TRATO DE AGREGAR LA FUNCION
-      
-
-         // $uploadPath = "../../img/"; 
-         // $fileName = basename($_FILES["image"]["name"]);
-         // $imageUploadPath = $uploadPath . $fileName; 
-          // Comprimos el fichero FALTA AGREGAR FUNCION Y REQUISITOS DE COMPRESOR Y MOVER
-         // $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
-          //POSIBLE QUITAR MOVE
+      $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
           
+      if ($txtImagen != "") {
+        //AGREGAR LA FUNCION de upload.php
         move_uploaded_file($tmpImagen, "../../img/" . $nombreArchivo);
-      }
+       }
 
       $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
       $sentenciaSQL->execute();
 
       header("Location:productos.php");
-
-    }//fin de type
-    //else{
-     // $mensaje = "Solo se permiten archivos de imagen (JPEG, PNG, GIF)";}
-    }//fin de size
-     else {
-      $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
-    }
+    
     break;
 
   case "Modificar": //AQUI TAMBIEN AGREGAR TAMANO Y COMPRIMIR IMAGEN
@@ -270,5 +225,14 @@ print_r($a);*/
   </table>
 
 </div>
+
+
+<!--tiene las funciones:Comprimir, renombre, formatos y size--> <br>
+<form action="../comprimir/upload.php" method="post" enctype="multipart/form-data">
+  <label>Selecciona una imagen:</label>
+  <input type="hidden" name="getimagesize" value="5120000">
+  <input type="file" name="image">
+  <input type="submit" name="submit" value="Subir">
+</form>
 
 <?php include("../template/pie.php"); ?>
