@@ -13,6 +13,8 @@ include("../config/bd.php");
 switch ($accion) {
 
   case "Agregar":
+    if ($_FILES['txtImagen']['size'] <= 5120000) {
+      //posible aqui colocar el [type]recomodar de post[accion]
 //El criterio de size solo aplica a archivo, falta a bd
     $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
     $sentenciaSQL->bindParam(':nombre', $txtNombre);
@@ -100,7 +102,10 @@ switch ($accion) {
     }
     $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
     $sentenciaSQL->execute();
-    header("Location:productos.php");//al suspender esto, salen $statusMsg
+    header("Location:productos.php"); //al suspender esto, salen $statusMsg
+    } else {
+      $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
+    }
     break;
 
   case "Modificar": //AQUI TAMBIEN AGREGAR TAMANO Y COMPRIMIR IMAGEN
