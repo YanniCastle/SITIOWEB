@@ -103,9 +103,11 @@ switch ($accion) {
     $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
     $sentenciaSQL->execute();
     header("Location:productos.php"); //al suspender esto, salen $statusMsg
-    } else {
+    }//fin de [size] 
+    else {
       $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
-    }
+    }//mensaje de [size]
+    
     break;
 
   case "Modificar": //AQUI TAMBIEN AGREGAR TAMANO Y COMPRIMIR IMAGEN
