@@ -239,7 +239,7 @@ $listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
           <?php } ?>
 
           <input type="hidden" name="getimagesize" value="5120000">
-          <input type="file" class="form-control" name="txtImagen" id="txtImagen">
+          <input type="file" required class="form-control" name="txtImagen" id="txtImagen">
         </div>
         <!--01:21:20-->
         <div class="btn-group" role="group" aria-label="">
