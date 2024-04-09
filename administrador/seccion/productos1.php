@@ -7,15 +7,16 @@ $txtID = (isset($_POST['txtID'])) ? $_POST['txtID'] : "";
 $txtNombre = (isset($_POST['txtNombre'])) ? $_POST['txtNombre'] : "";
 $txtImagen = (isset($_FILES['txtImagen']['name'])) ? $_FILES['txtImagen']['name'] : "";
 $accion = (isset($_POST['accion'])) ? $_POST['accion'] : "";
-
+//$Type = (isset($_FILES['txtImagen']['type'])) ? $_FILES['txtImagen']['type'] : "";
 include("../config/bd.php");
 
 switch ($accion) {
 
   case "Agregar":
+      $Type=$_FILES['txtImagen']['type'];
     if ($_FILES['txtImagen']['size'] <= 5120000) {
-      //posible aqui colocar el [type]recomodar de post[accion]
-//El criterio de size solo aplica a archivo, falta a bd
+       if ($Type='jpg' OR $Type='png' OR $Type='jpeg' OR $Type='gif') {
+       
     $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
     $sentenciaSQL->bindParam(':nombre', $txtNombre);
 
@@ -56,10 +57,11 @@ switch ($accion) {
       $uploadPath = "../../img/";
 
       // Si el fichero se ha enviado
-      $status = $statusMsg = '';
+     // $status = $statusMsg = '';
 
       if (isset($_POST["accion"])) {
-        if ($_FILES["txtImagen"]["size"] <= 5120000) {
+       // if ($_FILES["txtImagen"]["size"] <= 5120000) {
+              
           $status = 'error';
           if (!empty($_FILES["txtImagen"]["name"])) {
 
@@ -80,33 +82,38 @@ switch ($accion) {
               $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
 
               if ($compressedImage) {
-                $status = 'success';
-                $statusMsg = "La imagen se ha subido satisfactoriamente.";
+                //$status = 'success';
+                $mensaje = "La imagen se ha subido satisfactoriamente.";
               } else {
-                $statusMsg = "La compresion de la imagen ha fallado";
+                $mensaje = "La compresion de la imagen ha fallado";
               }
             } else {
-              $statusMsg = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
+              $mensaje = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
             }
           } else {
-            $statusMsg = 'Por favor, selecciona una imagen.';
+            $mensaje = 'Por favor, selecciona una imagen.';
           }
-        }/*fin de size */ else {
-          echo "Demasiado grande la imagen";
-        }
+          
+        //}/*fin de size */ else {
+        //  echo "Demasiado grande la imagen";
+        //}
       }//fin del post
 
       // Mostrar el estado de la imagen 
-      echo $statusMsg; 
-      
+     // echo $statusMsg; 
     }
+      
     $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
     $sentenciaSQL->execute();
-    header("Location:productos1.php"); //al suspender esto, salen $statusMsg
+    //header("Location:productos1.php"); //al suspender esto, salen $statusMsg
+      } //fin de type
+      else {
+        $mensaje = 'Solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
+      }
     }//fin de [size] 
     else {
       $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
-    }//mensaje de [size]
+    }
     
     break;
 
