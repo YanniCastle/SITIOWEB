@@ -12,101 +12,98 @@ include("../config/bd.php");
 switch ($accion) {
 
   case "Agregar":
-  if ($_FILES['txtImagen']['name'] != "") {
+    if ($_FILES['txtImagen']['name'] != "") {
 
       // Permitimos solo unas extensiones
       $allowTypes = array('image/jpg', 'image/png', 'image/jpeg', 'image/gif');
       $fileType = $_FILES['txtImagen']['type'];
       if (in_array($fileType, $allowTypes)) {
 
-    
-    if ($_FILES['txtImagen']['size'] <= 5120000) {
-        $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
-        $sentenciaSQL->bindParam(':nombre', $txtNombre);
 
-        $fecha = new DateTime();
-        $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
+        if ($_FILES['txtImagen']['size'] <= 5120000) {
+          $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
+          $sentenciaSQL->bindParam(':nombre', $txtNombre);
 
-        if ($txtImagen != "") {
-          function compressImage($source, $destination, $quality)
-          {
-            // Obtenemos la información de la imagen
-            $imgInfo = getimagesize($source);
-            $mime = $imgInfo['mime'];
+          $fecha = new DateTime();
+          $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
 
-            // Creamos una imagen
-            switch ($mime) {
-              case 'image/jpeg':
-                $image = imagecreatefromjpeg($source);
-                break;
-              case 'image/png':
-                $image = imagecreatefrompng($source);
-                break;
-              case 'image/gif':
-                $image = imagecreatefromgif($source);
-                break;
-              default:
-                $image = imagecreatefromjpeg($source);
+          if ($txtImagen != "") {
+            function compressImage($source, $destination, $quality)
+            {
+              // Obtenemos la información de la imagen
+              $imgInfo = getimagesize($source);
+              $mime = $imgInfo['mime'];
+
+              // Creamos una imagen
+              switch ($mime) {
+                case 'image/jpeg':
+                  $image = imagecreatefromjpeg($source);
+                  break;
+                case 'image/png':
+                  $image = imagecreatefrompng($source);
+                  break;
+                case 'image/gif':
+                  $image = imagecreatefromgif($source);
+                  break;
+                default:
+                  $image = imagecreatefromjpeg($source);
+              }
+
+              // Guardamos la imagen
+              imagejpeg($image, $destination, $quality);
+
+              // Devolvemos la imagen comprimida
+              return $destination;
             }
+            // Ruta subida
+            $uploadPath = "../../img/";
 
-            // Guardamos la imagen
-            imagejpeg($image, $destination, $quality);
+            if (isset($_POST["accion"])) {
 
-            // Devolvemos la imagen comprimida
-            return $destination;
-          }
-          // Ruta subida
-          $uploadPath = "../../img/";
+              if ($_FILES["txtImagen"]["name"] != "null") {
 
-          if (isset($_POST["accion"])) {
+                $fecha = new DateTime();
+                $nombreArchivoo = ($_FILES["txtImagen"]["name"] != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
 
-            if ($_FILES["txtImagen"]["name"]!="null") {
+                $fileName = basename($_FILES["txtImagen"]["name"]);
+                $imageUploadPath = $uploadPath . $nombreArchivoo;
+                $fileType = pathinfo($imageUploadPath, PATHINFO_EXTENSION);
 
-              $fecha = new DateTime();
-              $nombreArchivoo = ($_FILES["txtImagen"]["name"] != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
+                // Permitimos solo unas extensiones
+                $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+                if (in_array($fileType, $allowTypes)) {
+                  // Image temp source 
+                  $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
 
-              $fileName = basename($_FILES["txtImagen"]["name"]);
-              $imageUploadPath = $uploadPath . $nombreArchivoo;
-              $fileType = pathinfo($imageUploadPath, PATHINFO_EXTENSION);
+                  // Comprimos el fichero
+                  $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
 
-              // Permitimos solo unas extensiones
-              $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
-              if (in_array($fileType, $allowTypes)) {
-                // Image temp source 
-                $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
-
-                // Comprimos el fichero
-                $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
-
-                if ($compressedImage) {
-                  $mensaje = "La imagen se ha subido correctamente.";
+                  if ($compressedImage) {
+                    $mensaje = "La imagen se ha subido correctamente.";
+                  } else {
+                    $mensaje = "La compresion de la imagen ha fallado";
+                  }
                 } else {
-                  $mensaje = "La compresion de la imagen ha fallado";
+                  $mensaje = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
                 }
               } else {
-                $mensaje = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
+                $mensaje = 'Poor favor, selecciona una imagen.';
               }
-            } else  {
-              $mensaje = 'Poor favor, selecciona una imagen.';
-            }
+            } //fin del post
+          }
 
-          } //fin del post
+          $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
+          $sentenciaSQL->execute();
+        } //fin de [size] 
+        else {
+          $mensaje = "El archivo es demasiado grande, tamaño máximo permitido es de 5 MB.";
         }
-
-        $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
-        $sentenciaSQL->execute();
-    } //fin de [size] 
-    else {
-      $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
-    }
-  } //fin de las extensiones
+      } //fin de las extensiones
 
       else {
-        $mensaje = 'solo utiliza imagenes.';
+        $mensaje = 'Solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
       }
-
-    
-  } //fin de  $_FILES['txtImagen']['name'] != ""
+    } //fin de  $_FILES['txtImagen']['name'] != ""
     else {
       $mensaje = 'Por favor, selecciona una imagen.';
     }
@@ -115,9 +112,9 @@ switch ($accion) {
 
 
 
-    
 
-    
+
+
   case "Modificar": //AQUI TAMBIEN AGREGAR TAMANO Y COMPRIMIR IMAGEN
     //Aqui solo modificamos el registro
     $sentenciaSQL = $conexion->prepare("UPDATE libros SET nombre=:nombre WHERE id=:id");
@@ -240,7 +237,7 @@ $listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
           <?php } ?>
 
           <input type="hidden" name="getimagesize" value="5120000">
-          <input type="file" class="form-control" name="txtImagen" id="txtImagen">
+          <input type="file" accept="image/*" class=" form-control" name="txtImagen" id="txtImagen">
         </div>
         <!--01:21:20-->
         <div class=" btn-group" role="group" aria-label="">
