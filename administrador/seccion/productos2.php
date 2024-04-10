@@ -7,109 +7,117 @@ $txtID = (isset($_POST['txtID'])) ? $_POST['txtID'] : "";
 $txtNombre = (isset($_POST['txtNombre'])) ? $_POST['txtNombre'] : "";
 $txtImagen = (isset($_FILES['txtImagen']['name'])) ? $_FILES['txtImagen']['name'] : "";
 $accion = (isset($_POST['accion'])) ? $_POST['accion'] : "";
-
 include("../config/bd.php");
 
 switch ($accion) {
 
   case "Agregar":
+  if ($_FILES['txtImagen']['name'] != "") {
+
+      // Permitimos solo unas extensiones
+      $allowTypes = array('image/jpg', 'image/png', 'image/jpeg', 'image/gif');
+      $fileType = $_FILES['txtImagen']['type'];
+      if (in_array($fileType, $allowTypes)) {
+
+    
     if ($_FILES['txtImagen']['size'] <= 5120000) {
-      //posible aqui colocar el [type]recomodar de post[accion]
-//El criterio de size solo aplica a archivo, falta a bd
-    $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
-    $sentenciaSQL->bindParam(':nombre', $txtNombre);
+        $sentenciaSQL = $conexion->prepare("INSERT INTO libros (nombre, imagen) VALUES (:nombre, :imagen);");
+        $sentenciaSQL->bindParam(':nombre', $txtNombre);
 
-    $fecha = new DateTime();
-    $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
+        $fecha = new DateTime();
+        $nombreArchivo = ($txtImagen != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
 
-    $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
+        if ($txtImagen != "") {
+          function compressImage($source, $destination, $quality)
+          {
+            // Obtenemos la información de la imagen
+            $imgInfo = getimagesize($source);
+            $mime = $imgInfo['mime'];
 
-    if ($txtImagen != "") {
-      function compressImage($source, $destination, $quality)
-      {
-        // Obtenemos la información de la imagen
-        $imgInfo = getimagesize($source);
-        $mime = $imgInfo['mime'];
-
-        // Creamos una imagen
-        switch ($mime) {
-          case 'image/jpeg':
-            $image = imagecreatefromjpeg($source);
-            break;
-          case 'image/png':
-            $image = imagecreatefrompng($source);
-            break;
-          case 'image/gif':
-            $image = imagecreatefromgif($source);
-            break;
-          default:
-            $image = imagecreatefromjpeg($source);
-        }
-
-        // Guardamos la imagen
-        imagejpeg($image, $destination, $quality);
-
-        // Devolvemos la imagen comprimida
-        return $destination;
-      } 
-      // Ruta subida
-      $uploadPath = "../../img/";
-
-      // Si el fichero se ha enviado
-      $status = $statusMsg = '';
-
-      if (isset($_POST["accion"])) {
-        if ($_FILES["txtImagen"]["size"] <= 5120000) {
-          $status = 'error';
-          if (!empty($_FILES["txtImagen"]["name"])) {
-
-            $fecha = new DateTime();
-            $nombreArchivo = ($_FILES["txtImagen"]["name"] != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
-
-            $fileName = basename($_FILES["txtImagen"]["name"]);
-            $imageUploadPath = $uploadPath . $nombreArchivo;
-            $fileType = pathinfo($imageUploadPath, PATHINFO_EXTENSION);
-
-            // Permitimos solo unas extensiones
-            $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
-            if (in_array($fileType, $allowTypes)) {
-              // Image temp source 
-              $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
-
-              // Comprimos el fichero
-              $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
-
-              if ($compressedImage) {
-                $status = 'success';
-                $statusMsg = "La imagen se ha subido satisfactoriamente.";
-              } else {
-                $statusMsg = "La compresion de la imagen ha fallado";
-              }
-            } else {
-              $statusMsg = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
+            // Creamos una imagen
+            switch ($mime) {
+              case 'image/jpeg':
+                $image = imagecreatefromjpeg($source);
+                break;
+              case 'image/png':
+                $image = imagecreatefrompng($source);
+                break;
+              case 'image/gif':
+                $image = imagecreatefromgif($source);
+                break;
+              default:
+                $image = imagecreatefromjpeg($source);
             }
-          } else {
-            $statusMsg = 'Por favor, selecciona una imagen.';
-          }
-        }/*fin de size */ else {
-          echo "Demasiado grande la imagen";
-        }
-      }//fin del post
 
-      // Mostrar el estado de la imagen 
-      echo $statusMsg; 
-      
-    }
-    $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
-    $sentenciaSQL->execute();
-    header("Location:productos.php"); //al suspender esto, salen $statusMsg
-    }//fin de [size] 
+            // Guardamos la imagen
+            imagejpeg($image, $destination, $quality);
+
+            // Devolvemos la imagen comprimida
+            return $destination;
+          }
+          // Ruta subida
+          $uploadPath = "../../img/";
+
+          if (isset($_POST["accion"])) {
+
+            if ($_FILES["txtImagen"]["name"]!="null") {
+
+              $fecha = new DateTime();
+              $nombreArchivoo = ($_FILES["txtImagen"]["name"] != "") ? $fecha->getTimestamp() . "_" . $_FILES["txtImagen"]["name"] : "sin_imagen.jpg";
+
+              $fileName = basename($_FILES["txtImagen"]["name"]);
+              $imageUploadPath = $uploadPath . $nombreArchivoo;
+              $fileType = pathinfo($imageUploadPath, PATHINFO_EXTENSION);
+
+              // Permitimos solo unas extensiones
+              $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+              if (in_array($fileType, $allowTypes)) {
+                // Image temp source 
+                $tmpImagen = $_FILES["txtImagen"]["tmp_name"];
+
+                // Comprimos el fichero
+                $compressedImage = compressImage($tmpImagen, $imageUploadPath, 12);
+
+                if ($compressedImage) {
+                  $mensaje = "La imagen se ha subido correctamente.";
+                } else {
+                  $mensaje = "La compresion de la imagen ha fallado";
+                }
+              } else {
+                $mensaje = 'Lo sentimos, solo se permiten imágenes con estas extensiones: JPG, JPEG, PNG, & GIF.';
+              }
+            } else  {
+              $mensaje = 'Poor favor, selecciona una imagen.';
+            }
+
+          } //fin del post
+        }
+
+        $sentenciaSQL->bindParam(':imagen', $nombreArchivo);
+        $sentenciaSQL->execute();
+    } //fin de [size] 
     else {
       $mensaje = "El archivo es demasiado grande. El tamaño máximo permitido es de 5 MB.";
-    }//mensaje de [size]
+    }
+  } //fin de las extensiones
+
+      else {
+        $mensaje = 'solo utiliza imagenes.';
+      }
+
     
+  } //fin de  $_FILES['txtImagen']['name'] != ""
+    else {
+      $mensaje = 'Por favor, selecciona una imagen.';
+    }
     break;
 
+
+
+
+    
+
+    
   case "Modificar": //AQUI TAMBIEN AGREGAR TAMANO Y COMPRIMIR IMAGEN
     //Aqui solo modificamos el registro
     $sentenciaSQL = $conexion->prepare("UPDATE libros SET nombre=:nombre WHERE id=:id");
@@ -141,12 +149,12 @@ switch ($accion) {
       $sentenciaSQL->bindParam(':id', $txtID);
       $sentenciaSQL->execute(); //2:25:20
     }
-    header("Location:productos.php"); //2:39:24 Pruebas de redireccionar
+    header("Location:productos2.php"); //2:39:24 Pruebas de redireccionar
     //echo "Presionado botón: Modificar";
     break;
 
   case "Cancelar":
-    header("Location:productos.php");
+    header("Location:productos2.php");
     //echo "Presionado botón: Cancelar";
     break;
 
@@ -177,7 +185,7 @@ switch ($accion) {
     $sentenciaSQL = $conexion->prepare("DELETE FROM libros WHERE id=:id");
     $sentenciaSQL->bindParam(':id', $txtID);
     $sentenciaSQL->execute();
-    header("Location:productos.php");
+    header("Location:productos2.php");
     //echo "Presionado botón: Borrar";
     break;
 }
@@ -186,17 +194,9 @@ switch ($accion) {
 $sentenciaSQL = $conexion->prepare("SELECT * FROM libros");
 $sentenciaSQL->execute();
 $listaLibros = $sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
-/*print_r($_POST);*/
-/*print_r($_FILES);*//*Si se deja asi sale toda la inf*/
-
-/*01:19:19 Revisar porque no imprime:SOLUCION:button type:submit, no button*/
-/*Ejemplo, si imprime,
-$a = array('a' => 'manzana', 'b' => 'banana', 'c' => array('x', 'y', 'z'));
-print_r($a);*/
 ?>
 
 <!--Formulario de Captura de libros -->
-<!--CAMBIAR A SOLO IMAGENES JPG GIF PNG -->
 <div class="col-md-5">
 
   <div class="card">
@@ -243,7 +243,7 @@ print_r($a);*/
           <input type="file" class="form-control" name="txtImagen" id="txtImagen">
         </div>
         <!--01:21:20-->
-        <div class="btn-group" role="group" aria-label="">
+        <div class=" btn-group" role="group" aria-label="">
           <button type="submit" name="accion" <?php echo ($accion == "Seleccionar") ? "disabled" : ""; ?>
             value="Agregar" class="btn btn-success">Agregar</button>
           <button type="submit" name="accion" <?php echo ($accion != "Seleccionar") ? "disabled" : ""; ?>
@@ -257,8 +257,6 @@ print_r($a);*/
     </div>
   </div>
 </div>
-
-
 
 
 <!--tABLA DONDE SE MUESTRAN LOS LIBROS: Lista-->
@@ -302,13 +300,5 @@ print_r($a);*/
 
 </div>
 
-
-<!--tiene las funciones:Comprimir, renombre, formatos y size--> <br>
-<form action="../comprimir/upload.php" method="post" enctype="multipart/form-data">
-  <label>Selecciona una imagen:</label>
-  <input type="hidden" name="getimagesize" value="5120000">
-  <input type="file" name="image">
-  <input type="submit" name="submit" value="Subir">
-</form>
 
 <?php include("../template/pie.php"); ?>
