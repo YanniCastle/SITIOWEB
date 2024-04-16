@@ -1,36 +1,36 @@
 <?php include("template/cabecera.php"); ?>
-
-<!--<div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+<h2>Carrusel simple (solo se mueve)</h2>
+<div class="carousel-inner">
+  <div class="carousel-item active">
+    <img class="d-block w-100" src="img/velocimetro_c.jpg" alt="First slide">
+  </div>
+  <div class="carousel-item">
+    <img class="d-block w-100" src="img/cargador_sony_c.jpg" alt="Second slide">
+  </div>
+  <div class="carousel-item">
+    <img class="d-block w-100" src="img/antitranspirante_c.jpg" alt="Third slide">
+  </div>
+</div>
+</div>
+<br><br><br>
+<h2>Carrusel con flechas (se mueve y podemos mover)</h2>
+<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img class="d-block w-100" src="img/1709916610_audifonos_bluetooh.jpg" alt="First slide">
+      <img class="d-block w-100" src="img/audifonos bluetooh_c.jpg" alt="First slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="img/1709916642_1709810904_Azafatas.jpg" alt="Second slide">
+      <img class="d-block w-100" src="img/1709810904_Azafatas.jpg" alt="Second slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="img/1709916663_1709816219_WD 40.jpg" alt="Third slide">
+      <img class="d-block w-100" src="img/cargador_sony_c.jpg" alt="Third slide">
     </div>
   </div>
-  </div>-->
-
-<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img class="d-block w-100" src="img/1709916610_audifonos_bluetooh.jpg" alt="First slide">
-    </div>
-    <div class="carousel-item">
-      <img class="d-block w-100" src="img/1709916642_1709810904_Azafatas.jpg" alt="Second slide">
-    </div>
-    <div class="carousel-item">
-      <img class="d-block w-100" src="img/1709916663_1709816219_WD 40.jpg" alt="Third slide">
-    </div>
-  </div>
-  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="sr-only">Previous</span>
   </a>
-  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="sr-only">Next</span>
   </a>
@@ -64,5 +64,7 @@
     <span class="sr-only">Next</span>
   </a>
 </div>-->
+
+<script src="./js/bootstrap.bundle.min.js" integrity="slide"></script>
 
 <?php include("template/pie.php"); ?>
